@@ -34,7 +34,7 @@ RUN cargo build --release
 FROM debian:bookworm-slim
 
 WORKDIR /service
-COPY --from=build /app/service/target/release/service .
+COPY --from=build /app/target/release/service .
 ENV RUST_LOG=debug
 EXPOSE 8000
 

@@ -39,6 +39,7 @@ FROM debian:bookworm-slim
 WORKDIR /service
 COPY --from=build /app/target/x86_64-unknown-linux-musl/release/service .
 ENV RUST_LOG=debug
+ENV RUST_BACKTRACE=1
 EXPOSE 8000
 
 ENTRYPOINT [ "./service"]

@@ -16,6 +16,7 @@ pub fn create_route(services: Arc<ServiceCollection>) -> Router {
         .route("/", get(root_links))
         .route("/health", get(health))
         .route("/job", post(create_job))
+        .route("/job/:job_id", get(get_job))
         .with_state(services)
 }
 

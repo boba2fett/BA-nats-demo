@@ -6,12 +6,13 @@ edition = "2021"
 [dependencies]
 common = { path = "../common" }
 axum = "0.6.18"
+axum-server = { version = "0.5.1", features = ["tls-rustls"]}
 async-trait = "0.1.68"
 tokio = { version = "1.28.2", features = ["macros", "rt-multi-thread"]}
 serde = { version = "1.0.164", features = ["derive"] }
 serde_repr = "0.1.12"
 serde_json = "1.0.96"
-reqwest = { version = "0.11.18", features = ["gzip", "deflate", "stream", "json"] }
+reqwest = {version = "0.11.18", default-features = false, features = ["gzip", "deflate", "stream", "json", "rustls-tls"]}
 futures = { version = "0.3.28" }
 tokio-util = "0.7.8"
 tokio-stream = "0.1.14"

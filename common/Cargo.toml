@@ -17,5 +17,5 @@ base64 = "0.21.2"
 tokio-util = "0.7.8"
 tokio-stream = "0.1.14"
 async-nats = "0.29.0"
-reqwest = {version = "0.11.18", features = ["gzip", "deflate", "stream", "json"]}
+reqwest = {version = "0.11.18", default-features = false, features = ["gzip", "deflate", "stream", "json", "rustls-tls"]}
 bytes = "1.4.0"

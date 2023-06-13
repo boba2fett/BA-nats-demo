@@ -381,6 +381,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "dlq-worker"
+version = "0.1.0"
+dependencies = [
+ "async-nats",
+ "async-trait",
+ "bytes",
+ "common",
+ "futures",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "serde_repr",
+ "tokio",
+ "tokio-stream",
+ "tokio-util",
+ "tracing",
+ "tracing-subscriber",
+ "uuid",
+]
+
+[[package]]
 name = "ed25519"
 version = "1.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"

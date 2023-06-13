@@ -1,5 +1,7 @@
 use std::sync::Arc;
 
+use async_nats::jetstream::stream::RetentionPolicy;
+
 use crate::models::{RefIdModel};
 
 use super::base::BaseJetstream;
@@ -19,6 +21,7 @@ impl PublishService {
         _ = base.jetstream.get_or_create_stream(async_nats::jetstream::stream::Config {
             name: stream.clone(),
             max_messages: 10_000,
+            retention: RetentionPolicy::WorkQueue,
             ..Default::default()
         }).await.map_err(|_| "could not get or create stream")?;
         Ok(PublishService {

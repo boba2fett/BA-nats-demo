@@ -1,5 +1,5 @@
 @endpoint = http://localhost:8000
-@job = /job/i47HxSOnL5tOrrt7N8oGJS4VuUzHBl?token=uRksSvJpTo7WXQxs53eBnnnjwgJEat
+@job = /job/a1UxM5Um2toGhwQfYqUIoDDaJru5EB?token=6Fgr7glu7DerSW62RX1WFitIpdyuqG
 ###
 GET {{endpoint}}
 ###
@@ -9,7 +9,7 @@ POST {{endpoint}}/job
 Content-Type: application/json
 
 {
-    "payload": "asdf"
+    "payload": "retry"
 }
 ###
 GET {{endpoint}}{{job}}

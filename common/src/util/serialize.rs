@@ -13,4 +13,8 @@ pub mod base64 {
         let base64 = String::deserialize(d)?;
         general_purpose::STANDARD_NO_PAD.decode(base64.as_bytes()).map_err(|e| serde::de::Error::custom(e))
     }
+
+    pub fn deserialize_str<'de>(base64: String) -> Result<Vec<u8>, &'static str> {
+        general_purpose::STANDARD_NO_PAD.decode(base64).map_err(|e| "base64 err")
+    }
 }

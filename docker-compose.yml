@@ -27,3 +27,12 @@ services:
   #   network_mode: host
   #   # depends_on:
   #   #   - nats
+  dlq_worker:
+    build:
+      context: .
+      dockerfile: ./dlq-worker/Dockerfile
+    environment:
+      NATS_URI: nats://mypc:4222
+    network_mode: host
+    # depends_on:
+    #   - nats

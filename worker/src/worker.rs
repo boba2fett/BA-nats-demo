@@ -16,7 +16,7 @@ impl IWorker for WorkerService {
         let mut job = self.get_job(job_id).await.map_err(|_| WorkError::NoRetry)?;
         let mut job = self.set_in_progress(&mut job).await.map_err(|_| WorkError::Retry)?;
 
-        self.work(&job).await.map_err(|_| WorkError::Retry)?;
+        self.work(&job).await?;
 
         _ = self.finish(&mut job).await.map_err(|_| WorkError::Retry)?;
         Ok(())
@@ -41,18 +41,15 @@ impl WorkerService {
         }
         Ok(job)
     }
-    async fn work<'a>(&self, job: &'a JobModel) -> Result<(), &'static str> {
-        info!("workin 10secs on job {}", &job.id);
-        sleep(Duration::from_secs(10)).await;
+    async fn work<'a>(&self, job: &'a JobModel) -> Result<(), WorkError> {
+        info!("workin 1sec on job {}", &job.id);
+        sleep(Duration::from_secs(1)).await;
+        if job.payload == "retry" {
+            return Err(WorkError::Retry)//TODO retrycount
+        }
+        if job.payload == "noretry" {
+            return Err(WorkError::NoRetry)
+        }
         Ok(())
     }
-    // async fn error<'a>(&self, job: &'a mut JobModel, err: String) -> Result<&'a mut JobModel, &'static str> {
-    //     job.status = JobStatus::Error;
-    //     job.message = Some(err);
-    //     self.object_store_service.set(job).await?;
-    //     if let Some(callback_uri) = &job.callback_uri {
-    //         self.client.post(callback_uri).json::<JobModel>(&job).send().await;
-    //     }
-    //     Ok(job)
-    // }
 }

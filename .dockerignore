@@ -1,0 +1,13 @@
+target
+tmp
+.git
+transform.json
+preview.json
+README.md
+libpdfium.so
+api.http
+.gitignore
+_example
+Dockerfile
+docker-compose.yml
+.rustfmt.toml

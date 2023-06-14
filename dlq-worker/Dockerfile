@@ -34,12 +34,12 @@ COPY dlq-worker/src dlq-worker/src
 
 RUN cargo build --release --target x86_64-unknown-linux-musl
 
-FROM debian:bookworm-slim
+FROM scratch
 
 WORKDIR /dlq_worker
 COPY --from=build /app/target/x86_64-unknown-linux-musl/release/dlq-worker .
 ENV RUST_LOG=debug
-ENV RUST_BACKTRACE=1
+ENV RUST_BACKTRACE=full
 EXPOSE 8000
 
 ENTRYPOINT [ "./dlq-worker"]

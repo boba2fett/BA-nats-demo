@@ -2,7 +2,7 @@ use std::{sync::Arc};
 
 use async_nats::{jetstream::{stream::{Stream, RetentionPolicy}, AckKind}};
 use futures::StreamExt;
-use tracing::{error, info};
+use tracing::{error, info, warn};
 
 use crate::models::IdModel;
 
@@ -50,10 +50,13 @@ pub enum WorkError {
 impl<Worker> ISubscribeService for SubscribeService<Worker> where Worker: IWorker {
     async fn subscribe(&self) -> Result<(), &'static str> {
         let consumer = self.stream.get_or_create_consumer(&self.consumer, async_nats::jetstream::consumer::pull::Config {
-            durable_name: Some(self.consumer.to_string()),
+            durable_name: Some(self.consumer.clone()),
             max_deliver: 5, //TODO
             ..Default::default()
-        }).await.map_err(|_| "could not get or create consumer")?;
+        }).await.map_err(|e| {
+            warn!("ERROR {}", e);
+            "could not get or create consumer"
+        })?;
         let mut messages = consumer.messages().await.map_err(|_| "could not get messages")?;
         while let Some(Ok(msg)) = messages.next().await {
             info!("procressing next message");

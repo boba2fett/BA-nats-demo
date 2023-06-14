@@ -34,12 +34,12 @@ COPY service/src service/src
 
 RUN cargo build --release --target x86_64-unknown-linux-musl
 
-FROM debian:bookworm-slim
+FROM scratch
 
 WORKDIR /service
 COPY --from=build /app/target/x86_64-unknown-linux-musl/release/service .
 ENV RUST_LOG=debug
-ENV RUST_BACKTRACE=1
+ENV RUST_BACKTRACE=full
 EXPOSE 8000
 
 ENTRYPOINT [ "./service"]

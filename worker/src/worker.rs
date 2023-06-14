@@ -45,7 +45,7 @@ impl WorkerService {
         info!("workin 1sec on job {}", &job.id);
         sleep(Duration::from_secs(1)).await;
         if job.payload == "retry" {
-            return Err(WorkError::Retry)//TODO retrycount
+            return Err(WorkError::Retry)
         }
         if job.payload == "noretry" {
             return Err(WorkError::NoRetry)

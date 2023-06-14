@@ -1,4 +1,4 @@
-use std::{sync::Arc};
+use std::{sync::Arc, time::Duration};
 
 use async_nats::{jetstream::{stream::{Stream, Source}, AckKind}};
 use futures::StreamExt;
@@ -26,7 +26,7 @@ pub struct DLQSubscribeService<DLQWorker>  {
 }
 
 impl<Worker> DLQSubscribeService<Worker> {
-    pub async fn build(base: Arc<BaseJetstream>, stream: String, worker: Worker, consumer: String) -> Result<Self, &'static str> {
+    pub async fn build(base: Arc<BaseJetstream>, stream: String, worker: Worker, consumer: String, max_age_mirror: Duration) -> Result<Self, &'static str> {
         let mirror_stream = base.jetstream.get_or_create_stream(async_nats::jetstream::stream::Config {
             name: format!("{}-mirror", stream),
             max_messages: 10_000,
@@ -34,7 +34,8 @@ impl<Worker> DLQSubscribeService<Worker> {
                 name: stream.clone(),
                 ..Default::default()
             }),
-            ..Default::default()//max_age TODO
+            max_age: max_age_mirror,
+            ..Default::default()
         }).await.map_err(|_| "could not get or create stream")?;
 
         let dlq_stream = base.jetstream.get_or_create_stream(async_nats::jetstream::stream::Config {

@@ -17,17 +17,11 @@ pub struct PublishService  {
 }
 
 impl PublishService {
-    pub async fn build(base: Arc<BaseJetstream>, stream: String) -> Result<Self, &'static str> {
-        _ = base.jetstream.get_or_create_stream(async_nats::jetstream::stream::Config {
-            name: stream.clone(),
-            max_messages: 10_000,
-            retention: RetentionPolicy::WorkQueue,
-            ..Default::default()
-        }).await.map_err(|_| "could not get or create stream")?;
-        Ok(PublishService {
+    pub fn new(base: Arc<BaseJetstream>, stream: String) -> Self {
+        PublishService {
             base,
             stream,
-        })
+        }
     }
 }
 

@@ -14,11 +14,6 @@ services:
     environment:
       NATS_URI: nats://localhost:4222
     network_mode: host
-  # different_worker:
-  #   build: worker
-  #   environment:
-  #     NATS_URI: nats://host.docker.internal:4222
-  #   network_mode: host
   dlq_worker:
     build:
       context: .

@@ -4,11 +4,11 @@ use tokio::io::AsyncReadExt;
 
 use crate::{models::JobModel, util::stream::VecReader};
 
-use super::base::BaseJetstream;
+use super::base::BaseJetStream;
 
 #[async_trait::async_trait]
 pub trait IObjectStoreService: Sync + Send {
-    async fn set<'a>(&self, job: &'a JobModel) -> Result<(), &'static str>;
+    async fn put<'a>(&self, job: &'a JobModel) -> Result<(), &'static str>;
     async fn get<'a>(&self, id: &'a str) -> Result<Option<JobModel>, &'static str>;
 }
 
@@ -17,12 +17,12 @@ pub struct ObjectStoreService  {
 }
 
 impl ObjectStoreService {
-    pub async fn build(base: Arc<BaseJetstream>, bucket: String, max_age: Duration) -> Result<Self, &'static str> {
+    pub async fn build(base: Arc<BaseJetStream>, bucket: String, max_age: Duration) -> Result<Self, &'static str> {
         let store = base.jetstream.create_object_store(Config {
             bucket,
             max_age,
             ..Default::default()
-        }).await.map_err(|_| "could not get object store")?;
+        }).await.map_err(|_| "could not create object store bucket")?;
         Ok(ObjectStoreService {
             store
         })
@@ -31,22 +31,22 @@ impl ObjectStoreService {
 
 #[async_trait::async_trait]
 impl IObjectStoreService for ObjectStoreService {
-    async fn set<'a>(&self, job: &'a JobModel) -> Result<(), &'static str>{
-        let json = serde_json::to_vec(&job).map_err(|_| "not valid json")?;
+    async fn put<'a>(&self, job: &'a JobModel) -> Result<(), &'static str>{
+        let json = serde_json::to_vec(&job).map_err(|_| "job is not valid json")?;
         let mut stream = VecReader {
             vec: json
         };
-        self.store.put(job.id.as_str(), &mut stream).await.map_err(|_| "not published")?;
+        self.store.put(job.id.as_str(), &mut stream).await.map_err(|_| "could not put job")?;
         Ok(())
     }
     async fn get<'a>(&self, id: &'a str) -> Result<Option<JobModel>, &'static str>{
-        let mut stream = self.store.get(id).await.map_err(|_| "not published")?;
+        let mut stream = self.store.get(id).await.map_err(|_| "could not get job")?;
         if stream.info.deleted {
             return Ok(None);
-        };
+        }
         let mut json = Vec::<u8>::new();
         stream.read_to_end(&mut json).await.map_err(|_| "could not read")?;
-        let job = serde_json::from_slice(&json).map_err(|_| "not valid json")?;
+        let job = serde_json::from_slice(&json).map_err(|_| "job is not valid json")?;
         Ok(Some(job))
     }
 }

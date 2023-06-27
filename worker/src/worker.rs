@@ -1,6 +1,6 @@
 use std::{sync::Arc, time::Duration};
 
-use common::{nats::{object_store::IObjectStoreService, subscribe::{IWorker, WorkError}}, models::{JobModel, JobStatus}};
+use common::{nats::{object_store::IObjectStoreService, subscribe::{IWorkerService, WorkError}}, models::{JobModel, JobStatus}};
 use tokio::time::sleep;
 use tracing::info;
 
@@ -10,7 +10,7 @@ pub struct WorkerService {
 }
 
 #[async_trait::async_trait]
-impl IWorker for WorkerService {
+impl IWorkerService for WorkerService {
     #[tracing::instrument(skip(self))]
     async fn work(&self, job_id: &str) -> Result<(), WorkError> {
         let mut job = self.get_job(job_id).await.map_err(|_| WorkError::NoRetry)?;
@@ -30,12 +30,12 @@ impl WorkerService {
     }
     async fn set_in_progress<'a>(&self, job: &'a mut JobModel) -> Result<&'a mut JobModel, &'static str> {
         job.status = JobStatus::InProgress;
-        self.object_store_service.set(job).await?;
+        self.object_store_service.put(job).await?;
         Ok(job)
     }
     async fn finish<'a>(&self, job: &'a mut JobModel) -> Result<&'a mut JobModel, &'static str> {
         job.status = JobStatus::Finished;
-        self.object_store_service.set(job).await?;
+        self.object_store_service.put(job).await?;
         if let Some(callback_uri) = &job.callback_uri {
             _ = self.client.post(callback_uri).json::<JobModel>(&job).send().await;
         }

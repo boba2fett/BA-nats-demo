@@ -1,10 +1,8 @@
 use std::sync::Arc;
 
-use async_nats::jetstream::stream::RetentionPolicy;
-
 use crate::models::{RefIdModel};
 
-use super::base::BaseJetstream;
+use super::base::BaseJetStream;
 
 #[async_trait::async_trait]
 pub trait IPublishService: Sync + Send {
@@ -12,12 +10,12 @@ pub trait IPublishService: Sync + Send {
 }
 
 pub struct PublishService  {
-    base: Arc<BaseJetstream>,
+    base: Arc<BaseJetStream>,
     stream: String,
 }
 
 impl PublishService {
-    pub fn new(base: Arc<BaseJetstream>, stream: String) -> Self {
+    pub fn new(base: Arc<BaseJetStream>, stream: String) -> Self {
         PublishService {
             base,
             stream,

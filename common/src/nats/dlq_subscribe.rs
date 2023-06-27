@@ -6,7 +6,7 @@ use tracing::{error, info};
 
 use crate::{models::{IdModel, MessageDLQModel}, util::serialize::base64};
 
-use super::base::BaseJetstream;
+use super::base::BaseJetStream;
 
 #[async_trait::async_trait]
 pub trait IDLQSubscribeService: Sync + Send {
@@ -14,7 +14,7 @@ pub trait IDLQSubscribeService: Sync + Send {
 }
 
 #[async_trait::async_trait]
-pub trait IDLQWorker: Sync + Send {
+pub trait IDLQWorkerService: Sync + Send {
     async fn work(&self, id: &str) -> ();
 }
 
@@ -26,7 +26,7 @@ pub struct DLQSubscribeService<DLQWorker>  {
 }
 
 impl<Worker> DLQSubscribeService<Worker> {
-    pub async fn build(base: Arc<BaseJetstream>, stream: String, worker: Worker, consumer: String, max_age_mirror: Duration) -> Result<Self, &'static str> {
+    pub async fn build(base: Arc<BaseJetStream>, stream: String, worker: Worker, consumer: String, max_age_mirror: Duration) -> Result<Self, &'static str> {
         let mirror_stream = base.jetstream.get_or_create_stream(async_nats::jetstream::stream::Config {
             name: format!("{}-mirror", stream),
             max_messages: 10_000,
@@ -58,7 +58,7 @@ impl<Worker> DLQSubscribeService<Worker> {
 }
 
 #[async_trait::async_trait]
-impl<Worker> IDLQSubscribeService for DLQSubscribeService<Worker> where Worker: IDLQWorker {
+impl<Worker> IDLQSubscribeService for DLQSubscribeService<Worker> where Worker: IDLQWorkerService {
     async fn subscribe(&self) -> Result<(), &'static str> {
         let consumer = self.dlq_stream.get_or_create_consumer(&format!("{}-dlq", self.consumer), async_nats::jetstream::consumer::pull::Config {
             durable_name: Some(self.consumer.to_string()),
@@ -83,7 +83,6 @@ impl<Worker> IDLQSubscribeService for DLQSubscribeService<Worker> where Worker: 
             if let Err(err) = work {
                 error!("Error occured processing message {err}");
             }
-            info!("processing next");
         }
         Ok(())
     }

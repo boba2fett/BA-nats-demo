@@ -1,18 +1,18 @@
 use std::sync::Arc;
 
-use common::{nats::{object_store::IObjectStoreService, dlq_subscribe::IDLQWorker}, models::{JobModel, JobStatus}};
+use common::{nats::{object_store::IObjectStoreService, dlq_subscribe::IDLQWorkerService}, models::{JobModel, JobStatus}};
 pub struct WorkerService {
     pub object_store_service: Arc<dyn IObjectStoreService>,
     pub client: reqwest::Client,
 }
 
 #[async_trait::async_trait]
-impl IDLQWorker for WorkerService {
+impl IDLQWorkerService for WorkerService {
     #[tracing::instrument(skip(self))]
     async fn work(&self, job_id: &str) -> () {
-        let mut job = self.get_job(job_id).await;
+        let job = self.get_job(job_id).await;
         if let Ok(mut job) = job {
-            let mut job = self.error(&mut job, "max retries used".to_string()).await;
+            _ = self.error(&mut job, "max retries used or not processable".to_string()).await;
         }
     }
 }
@@ -25,9 +25,9 @@ impl WorkerService {
     async fn error<'a>(&self, job: &'a mut JobModel, err: String) -> Result<&'a mut JobModel, &'static str> {
         job.status = JobStatus::Error;
         job.message = Some(err);
-        self.object_store_service.set(job).await?;
+        self.object_store_service.put(job).await?;
         if let Some(callback_uri) = &job.callback_uri {
-            self.client.post(callback_uri).json::<JobModel>(&job).send().await;
+            _ = self.client.post(callback_uri).json::<JobModel>(&job).send().await;
         }
         Ok(job)
     }

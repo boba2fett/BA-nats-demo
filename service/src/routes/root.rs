@@ -51,7 +51,7 @@ pub async fn create_job(State(services): State<Arc<ServiceCollection>>, Json(con
         payload: content.payload,
         callback_uri: content.callback_uri,
     };
-    if let Err(err) = services.object_store_service.set(&job).await {
+    if let Err(err) = services.object_store_service.put(&job).await {
         return Err((StatusCode::INTERNAL_SERVER_ERROR, err))
     }
     let headers = AppendHeaders([(header::LOCATION, location)]);

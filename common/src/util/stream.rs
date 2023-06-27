@@ -95,7 +95,7 @@ pub struct VecReader {
 }
 
 impl io::AsyncRead for VecReader {
-    fn poll_read(mut self: Pin<&mut Self>, cx: &mut Context, buf: &mut ReadBuf<'_>) -> Poll<io::Result<()>> {
+    fn poll_read(mut self: Pin<&mut Self>, _cx: &mut Context, buf: &mut ReadBuf<'_>) -> Poll<io::Result<()>> {
         let outstanding = buf.remaining().min(self.vec.len());
         if outstanding > 0 {
             buf.put_slice(&self.vec[..outstanding]);

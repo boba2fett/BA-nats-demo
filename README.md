@@ -1,16 +1,15 @@
 # BA NATS Demo
 
-Dies ist eine kleine Demo Anwedung, die demonstrieren soll wie NATS in einem Service-Worker Konstrukt eingesetzt werden kann. Der Service nimmt Jobs per HTTP an, versendet eine Nachricht in einen Stream und der Worker bearbeitet den Job. Zusätzlich gibt es noch einen Dead Letter Queue Worker, der vom Worker nicht erfolgreich verarbeitete Jobs übernimmt.
+Dies ist eine kleine Demo Anwendung, die demonstrieren soll wie NATS in einem Service-Worker Konstrukt zur Verarbeitung von Jobs eingesetzt werden kann. Der Service nimmt Jobs per HTTP an, versendet eine Nachricht in einen Stream und der Worker bearbeitet die Jobs. Zusätzlich gibt es noch einen Dead Letter Queue Worker, der vom Worker nicht erfolgreich verarbeitete Jobs übernimmt.
 
 ## Beispiel
 
-Zum Nachvollziehen der Beispiele werden Git (`git`), Docker (`docker`), cURL (`curl`) und die NATS CLI
-(`nats`) benötigt.
+Zum Nachvollziehen der Beispiele werden Git (`git`), Docker (`docker`), cURL (`curl`) und die NATS CLI (`nats`) benötigt.
 
 1. Git-Repository clonen `git clone https://github.com/boba2fett/BA-nats-demo`
 2. NATS Server starten `docker compose up -d` im Verzeichnis `nats-server` ausführen
 
-Der NATS SErver aknn nach den Beispielen per `docker compose down` wieder heruntergefahren werden.
+Der NATS Server kann nach den Beispielen per `docker compose down` wieder heruntergefahren werden.
 
 ### Verarbeitung durch zwei Worker
 

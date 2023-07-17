@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  nats-main:
+    image: nats:2.9.18-scratch
+    command: "-c main.conf -js -DV"
+    network_mode: host
+    volumes:
+      - ./main.conf:/main.conf
+  nats-leaf:
+    image: nats:2.9.18-scratch
+    command: "-c leaf.conf -js -DV"
+    network_mode: host
+    volumes:
+      - ./leaf.conf:/leaf.conf

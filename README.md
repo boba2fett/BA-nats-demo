@@ -24,7 +24,7 @@ Es ist nun zu beobachten, dass sich die Worker abwechseln. Im Object Store samme
 
 Um zu simulieren, dass der Worker den Job nicht verabeiten kann, wird im Payload beim Anlegen des Jobs `retry` mitgegeben.
 
-1. Umgebung mit zwei Workern starten `docker compose up`
+1. Umgebung starten `docker compose up`
 2. In einem anderen Kontext einen Job anlegen `curl -XPOST -H "Content-type: application/json" -d ’{"payload": "retry"}’ ’http://localhost:8000/job’`
 
 Nun ist zu beobachten, dass der Worker die Nachricht fünf Mal erhält, bis diese an den Dead Letter Queue Worker versendet wird. Eine Übersicht der Streams per `nats stream ls` zeigt, dass die ursprüngliche Nachricht im Stream `newJob` enthalten bleibt.

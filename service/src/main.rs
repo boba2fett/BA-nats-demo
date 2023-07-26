@@ -49,7 +49,7 @@ fn get_stream() -> String {
 }
 
 fn get_bucket() -> String {
-    env::var("NATS_OBJECT_STORE_BUCKET").unwrap_or_else(|_| "job".to_string())
+    env::var("NATS_KV_STORE_BUCKET").unwrap_or_else(|_| "job".to_string())
 }
 
 fn get_max_age() -> Duration {

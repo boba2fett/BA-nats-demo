@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
-use common::{nats::{object_store::IObjectStoreService, dlq_subscribe::IDLQWorkerService}, models::{JobModel, JobStatus}};
+use common::{nats::{kv_store::IKeyValueStoreService, dlq_subscribe::IDLQWorkerService}, models::{JobModel, JobStatus}};
 pub struct WorkerService {
-    pub object_store_service: Arc<dyn IObjectStoreService>,
+    pub kv_store_service: Arc<dyn IKeyValueStoreService>,
     pub client: reqwest::Client,
 }
 
@@ -19,13 +19,13 @@ impl IDLQWorkerService for WorkerService {
 
 impl WorkerService {
     async fn get_job(&self, job_id: &str) -> Result<JobModel, &'static str> {
-        let job = self.object_store_service.get(job_id).await?.ok_or("Not found")?;
+        let job = self.kv_store_service.get(job_id).await?.ok_or("Not found")?;
         Ok(job)
     }
     async fn error<'a>(&self, job: &'a mut JobModel, err: String) -> Result<&'a mut JobModel, &'static str> {
         job.status = JobStatus::Error;
         job.message = Some(err);
-        self.object_store_service.put(job).await?;
+        self.kv_store_service.put(job).await?;
         if let Some(callback_uri) = &job.callback_uri {
             _ = self.client.post(callback_uri).json::<JobModel>(&job).send().await;
         }

@@ -51,7 +51,7 @@ pub async fn create_job(State(services): State<Arc<ServiceCollection>>, Json(con
         payload: content.payload,
         callback_uri: content.callback_uri,
     };
-    if let Err(err) = services.object_store_service.put(&job).await {
+    if let Err(err) = services.kv_store_service.put(&job).await {
         return Err((StatusCode::INTERNAL_SERVER_ERROR, err))
     }
     let headers = AppendHeaders([(header::LOCATION, location)]);
@@ -63,7 +63,7 @@ pub async fn create_job(State(services): State<Arc<ServiceCollection>>, Json(con
 
 #[axum_macros::debug_handler]
 pub async fn get_job(State(services): State<Arc<ServiceCollection>>, Path(job_id): Path<String>, Query(token): Query<Token>) -> impl IntoResponse {
-    let job = services.object_store_service.get(&job_id).await;
+    let job = services.kv_store_service.get(&job_id).await;
     if let Err(err) = job {
         return Err((StatusCode::INTERNAL_SERVER_ERROR, err))
     }

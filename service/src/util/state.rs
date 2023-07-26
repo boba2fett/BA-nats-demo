@@ -1,10 +1,10 @@
 use std::{sync::Arc, time::Duration};
 
-use common::nats::{publish::{PublishService, IPublishService}, base::BaseJetStream, object_store::{IObjectStoreService, ObjectStoreService}};
+use common::nats::{publish::{PublishService, IPublishService}, base::BaseJetStream, kv_store::{IKeyValueStoreService, KeyValueStoreService}};
 
 pub struct ServiceCollection {
     pub publish_service: Arc<dyn IPublishService>,
-    pub object_store_service: Arc<dyn IObjectStoreService>,
+    pub kv_store_service: Arc<dyn IKeyValueStoreService>,
 }
 
 impl ServiceCollection {
@@ -12,7 +12,7 @@ impl ServiceCollection {
         let base_jetstream = Arc::new(BaseJetStream::build(nats_uri).await?);
         Ok(Arc::new(ServiceCollection{
             publish_service: Arc::new(PublishService::new(base_jetstream.clone(), stream)),
-            object_store_service: Arc::new(ObjectStoreService::build(base_jetstream.clone(), bucket, max_age).await?)
+            kv_store_service: Arc::new(KeyValueStoreService::build(base_jetstream.clone(), bucket, max_age).await?)
         }))
     }
 }

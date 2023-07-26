@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::models::{RefIdModel};
+use crate::models::RefIdModel;
 
 use super::base::BaseJetStream;
 

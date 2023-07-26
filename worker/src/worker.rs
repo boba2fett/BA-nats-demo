@@ -1,11 +1,11 @@
 use std::{sync::Arc, time::Duration};
 
-use common::{nats::{object_store::IObjectStoreService, subscribe::{IWorkerService, WorkError}}, models::{JobModel, JobStatus}};
+use common::{nats::{kv_store::IKeyValueStoreService, subscribe::{IWorkerService, WorkError}}, models::{JobModel, JobStatus}};
 use tokio::time::sleep;
 use tracing::info;
 
 pub struct WorkerService {
-    pub object_store_service: Arc<dyn IObjectStoreService>,
+    pub kv_store_service: Arc<dyn IKeyValueStoreService>,
     pub client: reqwest::Client,
 }
 
@@ -25,17 +25,17 @@ impl IWorkerService for WorkerService {
 
 impl WorkerService {
     async fn get_job(&self, job_id: &str) -> Result<JobModel, &'static str> {
-        let job = self.object_store_service.get(job_id).await?.ok_or("Not found")?;
+        let job = self.kv_store_service.get(job_id).await?.ok_or("Not found")?;
         Ok(job)
     }
     async fn set_in_progress<'a>(&self, job: &'a mut JobModel) -> Result<&'a mut JobModel, &'static str> {
         job.status = JobStatus::InProgress;
-        self.object_store_service.put(job).await?;
+        self.kv_store_service.put(job).await?;
         Ok(job)
     }
     async fn finish<'a>(&self, job: &'a mut JobModel) -> Result<&'a mut JobModel, &'static str> {
         job.status = JobStatus::Finished;
-        self.object_store_service.put(job).await?;
+        self.kv_store_service.put(job).await?;
         if let Some(callback_uri) = &job.callback_uri {
             _ = self.client.post(callback_uri).json::<JobModel>(&job).send().await;
         }

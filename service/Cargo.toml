@@ -7,10 +7,10 @@ edition = "2021"
 common = { path = "../common" }
 axum = "0.6.19"
 axum-server = { version = "0.5.1", features = ["tls-rustls"]}
-async-trait = "0.1.71"
+async-trait = "0.1.72"
 tokio = { version = "1.29.1", features = ["macros", "rt-multi-thread"]}
-serde = { version = "1.0.171", features = ["derive"] }
-serde_repr = "0.1.14"
+serde = { version = "1.0.175", features = ["derive"] }
+serde_repr = "0.1.15"
 serde_json = "1.0.103"
 reqwest = {version = "0.11.18", default-features = false, features = ["gzip", "deflate", "stream", "json", "rustls-tls"]}
 futures = { version = "0.3.28" }
@@ -18,7 +18,7 @@ tokio-util = "0.7.8"
 tokio-stream = "0.1.14"
 bytes = "1.4.0"
 tower = { version = "0.4.13", features = ["timeout"] }
-tower-http = { version = "0.4.1", features = ["trace"] }
+tower-http = { version = "0.4.3", features = ["trace"] }
 tracing = "0.1.37"
 tracing-subscriber = { version = "0.3.17", features = ["json"] }
 axum-macros = "0.3.8"

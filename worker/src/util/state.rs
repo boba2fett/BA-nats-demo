@@ -11,9 +11,9 @@ pub struct ServiceCollection {
 impl ServiceCollection {
     pub async fn build(nats_uri: &str, stream: String, bucket: String, consumer: String, max_age: Duration, max_deliver: i64, consumer_ack_wait: Duration) -> Result<Arc<Self>, &'static str> {
         let base_jetstream = Arc::new(BaseJetStream::build(nats_uri).await?);
-        let object_store_service = Arc::new(KeyValueStoreService::build(base_jetstream.clone(), bucket, max_age).await?);
+        let kv_store_service = Arc::new(KeyValueStoreService::build(base_jetstream.clone(), bucket, max_age).await?);
         let worker = WorkerService {
-            kv_store_service: object_store_service,
+            kv_store_service,
             client: reqwest::Client::builder().danger_accept_invalid_certs(true).build().unwrap(),
         };
         Ok(Arc::new(ServiceCollection {

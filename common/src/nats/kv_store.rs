@@ -21,7 +21,7 @@ impl KeyValueStoreService {
             bucket,
             max_age,
             ..Default::default()
-        }).await.map_err(|_| "could not create object store bucket")?;
+        }).await.map_err(|_| "could not create key value store bucket")?;
         Ok(KeyValueStoreService {
             key_value
         })
